@@ -628,7 +628,8 @@
     #define E1_ENABLE_PIN      30
 
     #define SPINDLE             4
-    
+    #define SPINDLE_PWM        45
+
 
 #if MB(RAMPS_13_EEB)  //FMM added for Filament Extruder
 #ifdef FILAMENT_SENSOR
