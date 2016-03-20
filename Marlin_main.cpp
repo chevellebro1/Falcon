@@ -1941,7 +1941,7 @@ void process_commands()
     case 3: // M3 - Spindle On
       if (code_seen('S')){
         digitalWrite(SPINDLE, HIGH);
-        SPINDLE_PWM=constrain(code_value(),0,255);
+        SPINDLE_PWM == constrain(code_value(),0,255);
       }
       else {
         digitalWrite(SPINDLE, HIGH);
