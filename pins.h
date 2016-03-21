@@ -627,9 +627,6 @@
     #define E1_DIR_PIN         34
     #define E1_ENABLE_PIN      30
 
-    #define SPINDLE             4
-    #define SPINDLE_PWM        45
-
 
 #if MB(RAMPS_13_EEB)  //FMM added for Filament Extruder
 #ifdef FILAMENT_SENSOR
@@ -2967,6 +2964,10 @@ DaveX plan for Teensylu/printrboard-type pinouts (ref teensylu & sprinter) for a
 #define Y_MIN_PIN          -1
 #define Z_MIN_PIN          -1
 #endif
+
+#define SPINDLE            32
+#define SPINDLE_PWM        45
+
 
 #define SENSITIVE_PINS {0, 1, X_STEP_PIN, X_DIR_PIN, X_ENABLE_PIN, X_MIN_PIN, X_MAX_PIN, Y_STEP_PIN, Y_DIR_PIN, Y_ENABLE_PIN, Y_MIN_PIN, Y_MAX_PIN, Z_STEP_PIN, Z_DIR_PIN, Z_ENABLE_PIN, Z_MIN_PIN, Z_MAX_PIN, PS_ON_PIN, \
                         HEATER_BED_PIN, FAN_PIN,                  \
