@@ -1939,17 +1939,23 @@ void process_commands()
     break;
 #endif
     case 3: // M3 - Spindle On
+      pinMode(SPINDLE, OUTPUT);
+      pinMode(SPINDLE_PWM, OUTPUT);
       if (code_seen('S')){
         digitalWrite(SPINDLE, HIGH);
         SPINDLE_PWM == constrain(code_value(),0,255);
       }
       else {
+        pinMode(SPINDLE, OUTPUT);
+        pinMode(SPINDLE_PWM, OUTPUT);
         digitalWrite(SPINDLE, HIGH);
         digitalWrite(SPINDLE_PWM, 255);
       }
       break;
 
     case 5: // M5 - Spindle Off
+        pinMode(SPINDLE, OUTPUT);
+        pinMode(SPINDLE_PWM, OUTPUT);
         digitalWrite(SPINDLE, LOW);
         digitalWrite(SPINDLE_PWM, 0);
       break;
