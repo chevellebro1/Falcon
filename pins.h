@@ -709,9 +709,9 @@
   #endif
 
   #define TEMP_0_PIN         13   // ANALOG NUMBERING
-  #define TEMP_1_PIN         15   // ANALOG NUMBERING
+  #define TEMP_1_PIN         12   // ANALOG NUMBERING
   #if MB(AZTEEG_X3_PRO)
-    #define TEMP_2_PIN         12   // ANALOG NUMBERING
+    #define TEMP_2_PIN         15   // ANALOG NUMBERING
     #define TEMP_3_PIN         11   // ANALOG NUMBERING
     #define TEMP_4_PIN         10   // ANALOG NUMBERING
     #define TC1                4    // ANALOG NUMBERING Thermo couple on Azteeg X3Pro

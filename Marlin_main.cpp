@@ -1586,6 +1586,35 @@ void process_commands()
           }
 
           delay(1000);
+
+
+/*
+          for(int8_t i=0; i < NUM_AXIS; i++) {
+            if(code_seen(axis_codes[i])) {
+               if(i == E_AXIS) {
+                 current_position[i] = code_value();
+                 plan_set_e_position(current_position[E_AXIS]);
+               }
+               else {
+    #ifdef SCARA
+    		if (i == X_AXIS || i == Y_AXIS) {
+                    	current_position[i] = code_value();
+    		}
+    		else {
+                    current_position[i] = code_value()+add_homing[i];
+                	}
+    #else
+    		current_position[i] = code_value()+add_homing[i];
+    #endif
+                plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
+               }
+            }
+          }
+          break;
+
+
+*/
+
 /*
 
           destination_lidar[X_AXIS] = -60;
