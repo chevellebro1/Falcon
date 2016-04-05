@@ -542,7 +542,7 @@
 
 
 // uncomment one of the following lines for RAMPS v1.3 or v1.0, comment both for v1.2 or 1.1
-// #define RAMPS_V_1_3
+#define RAMPS_V_1_3
 // #define RAMPS_V_1_0
 
 
@@ -657,15 +657,15 @@
   #endif
 
   #if MB(RAMPS_13_EFB) || MB(RAMPS_13_EFF) || MB(AZTEEG_X3)
-    #define FAN_PIN            9 // (Sprinter config)
+    #define FAN_PIN            -1 // (Sprinter config)
   #elif MB(AZTEEG_X3_PRO)
-    #define FAN_PIN            11 // Last Heater Pin on board
+    #define FAN_PIN            -1 // Last Heater Pin on board
   #else
-    #define FAN_PIN            4 // IO pin. Buffer needed
+    #define FAN_PIN            -1 // IO pin. Buffer needed
   #endif
 
   #if MB(3DRAG) || MB(RAMPS_13_EEF)
-    #define FAN_PIN            8
+    #define FAN_PIN            -1
   #endif
 
   #if MB(RAMPS_13_EFF)
@@ -681,29 +681,29 @@
   #endif
 
   #if MB(RAMPS_13_EFF)
-    #define HEATER_0_PIN       8
+    #define HEATER_0_PIN       9
   #else
-    #define HEATER_0_PIN       10   // EXTRUDER 1
+    #define HEATER_0_PIN       9   // EXTRUDER 1
   #endif
 
   #if MB(RAMPS_13_EFB) || MB(AZTEEG_X3)
-    #define HEATER_1_PIN       -1
+    #define HEATER_1_PIN       10
   #else
-    #define HEATER_1_PIN       9    // EXTRUDER 2 (FAN On Sprinter)
+    #define HEATER_1_PIN       10    // EXTRUDER 2 (FAN On Sprinter)
   #endif
 
 
   #if MB(3DRAG)
-    #define HEATER_0_PIN       10
-    #define HEATER_1_PIN       12
-    #define HEATER_2_PIN       6
+    #define HEATER_0_PIN       9
+    #define HEATER_1_PIN       10
+    #define HEATER_2_PIN       -1
   #elif MB(AZTEEG_X3_PRO)
-    #define HEATER_2_PIN       16
-    #define HEATER_3_PIN       17
-    #define HEATER_4_PIN       4
-    #define HEATER_5_PIN       5
-    #define HEATER_6_PIN       6
-    #define HEATER_7_PIN       11
+    #define HEATER_2_PIN       -1
+    #define HEATER_3_PIN       -1
+    #define HEATER_4_PIN       -1
+    #define HEATER_5_PIN       -1
+    #define HEATER_6_PIN       -1
+    #define HEATER_7_PIN       -1
   #else
     #define HEATER_2_PIN       -1
   #endif
@@ -891,8 +891,8 @@
   #define HEATER_BED_PIN    8    // RAMPS 1.1
   #define FAN_PIN           9    // RAMPS 1.1
 #endif
-#define HEATER_1_PIN        -1
-#define HEATER_2_PIN        -1
+#define HEATER_1_PIN        8
+#define HEATER_2_PIN        9
 #define TEMP_0_PIN          2    // MUST USE ANALOG INPUT NUMBERING NOT DIGITAL OUTPUT NUMBERING!!!!!!!!!
 #define TEMP_1_PIN          -1
 #define TEMP_2_PIN          -1
@@ -2967,6 +2967,12 @@ DaveX plan for Teensylu/printrboard-type pinouts (ref teensylu & sprinter) for a
 
 #define SPINDLE            32
 #define SPINDLE_PWM        63
+
+#define LIDAR_TRIGGER      23
+#define LIDAR_RESET        17
+
+//#define HEATER_0_PIN       9   // EXTRUDER 1
+//#define HEATER_1_PIN       10   // EXTRUDER 2
 
 
 #define SENSITIVE_PINS {0, 1, X_STEP_PIN, X_DIR_PIN, X_ENABLE_PIN, X_MIN_PIN, X_MAX_PIN, Y_STEP_PIN, Y_DIR_PIN, Y_ENABLE_PIN, Y_MIN_PIN, Y_MAX_PIN, Z_STEP_PIN, Z_DIR_PIN, Z_ENABLE_PIN, Z_MIN_PIN, Z_MAX_PIN, PS_ON_PIN, \

@@ -75,6 +75,7 @@
 // G4  - Dwell S<seconds> or P<milliseconds>
 // G10 - retract filament according to settings of M207
 // G11 - retract recover filament according to settings of M208
+// G20 - Lidar Edge Finder
 // G28 - Home all Axis
 // G29 - Detailed Z-Probe, probes the bed at 3 or more points.  Will fail if you haven't homed yet.
 // G30 - Single Z Probe, probes bed at current XY location.
@@ -349,6 +350,7 @@ const char echomagic[] PROGMEM = "echo:";
 //===========================================================================
 const char axis_codes[NUM_AXIS] = {'X', 'Y', 'Z', 'E'};
 static float destination[NUM_AXIS] = {  0.0, 0.0, 0.0, 0.0};
+static float destination_lidar[NUM_AXIS] = {  0.0, 0.0, 0.0, 0.0};
 
 #ifndef DELTA
 static float delta[3] = {0.0, 0.0, 0.0};
@@ -357,6 +359,7 @@ static float delta[3] = {0.0, 0.0, 0.0};
 static float offset[3] = {0.0, 0.0, 0.0};
 static bool home_all_axis = true;
 static float feedrate = 1500.0, next_feedrate, saved_feedrate;
+static float feedrate_lidar = 1500.0;
 static long gcode_N, gcode_LastN, Stopped_gcode_LastN = 0;
 
 static bool relative_mode = false;  //Determines Absolute or Relative Coordinates
@@ -608,6 +611,11 @@ void setup()
   setup_photpin();
   servo_init();
 
+
+  pinMode(LIDAR_RESET, OUTPUT);
+  pinMode(LIDAR_TRIGGER, OUTPUT);
+  digitalWrite(LIDAR_RESET, LOW);
+  digitalWrite(LIDAR_TRIGGER, LOW);
 
   lcd_init();
   _delay_ms(1000);	// wait 1sec to display the splash screen
@@ -1189,7 +1197,9 @@ static void homeaxis(int axis) {
       axis==Y_AXIS ? HOMEAXIS_DO(Y) :
       axis==Z_AXIS ? HOMEAXIS_DO(Z) :
       0) {
+
     int axis_home_dir = home_dir(axis);
+
 #ifdef DUAL_X_CARRIAGE
     if (axis == X_AXIS)
       axis_home_dir = x_home_dir(active_extruder);
@@ -1215,6 +1225,7 @@ static void homeaxis(int axis) {
 #endif // Z_PROBE_SLED
     destination[axis] = 1.5 * max_length(axis) * axis_home_dir;
     feedrate = homing_feedrate[axis];
+
     plan_buffer_line(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS], destination[E_AXIS], feedrate/60, active_extruder);
     st_synchronize();
 
@@ -1261,7 +1272,53 @@ static void homeaxis(int axis) {
 
   }
 }
+
+#define LIDAR_HOMEAXIS(LETTER) lidar_homeaxis(LETTER##_AXIS)
+
+static void lidar_homeaxis(int axis) {
+#define HOMEAXIS_DO_LIDAR(LETTER) \
+  ((LETTER##_MIN_PIN > -1 && LETTER##_HOME_DIR==-1) || (LETTER##_MAX_PIN > -1 && LETTER##_HOME_DIR==1))
+
+  if (axis==X_AXIS ? HOMEAXIS_DO_LIDAR(X) :
+      axis==Y_AXIS ? HOMEAXIS_DO_LIDAR(Y) :
+      axis==Z_AXIS ? HOMEAXIS_DO_LIDAR(Z) :
+      0) {
+
+    int axis_home_dir = home_dir(axis) * -1;
+
+    current_position[axis] = 0;
+    plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
+
+
+    destination[axis] = 1.5 * max_length(axis) * axis_home_dir;
+    feedrate = 500;
+
+    plan_buffer_line(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS], destination[E_AXIS], feedrate/60, active_extruder);
+    st_synchronize();
+
+    current_position[axis] = 0;
+    plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
+    destination[axis] = -home_retract_mm(axis) * axis_home_dir;
+    plan_buffer_line(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS], destination[E_AXIS], feedrate/60, active_extruder);
+    st_synchronize();
+
+    destination[axis] = 2*home_retract_mm(X_AXIS) * axis_home_dir;
+    feedrate = 200;
+
+    plan_buffer_line(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS], destination[E_AXIS], feedrate/60, active_extruder);
+    st_synchronize();
+
+    axis_is_at_home(axis);
+    destination[axis] = current_position[axis];
+    feedrate = 0.0;
+    endstops_hit_on_purpose();
+    axis_known_position[axis] = true;
+
+    }
+}
+
 #define HOMEAXIS(LETTER) homeaxis(LETTER##_AXIS)
+
 
 void refresh_cmd_timeout(void)
 {
@@ -1435,6 +1492,123 @@ void process_commands()
        #endif
       break;
       #endif //FWRETRACT
+
+    case 20: // G20 Lidar Edge Finder
+
+    saved_feedrate = feedrate;
+    saved_feedmultiply = feedmultiply;
+    feedmultiply = 100;
+    previous_millis_cmd = millis();
+
+
+    // First Move X and Y to Home Position
+
+    home_all_axis = !((code_seen(axis_codes[X_AXIS])) || (code_seen(axis_codes[Y_AXIS])) || (code_seen(axis_codes[Z_AXIS])));
+
+
+    if((home_all_axis) || (code_seen(axis_codes[X_AXIS])))
+    {
+      HOMEAXIS(X);
+    }
+
+    if((home_all_axis) || (code_seen(axis_codes[Y_AXIS]))) {
+      HOMEAXIS(Y);
+    }
+
+    if(code_seen(axis_codes[X_AXIS]))
+    {
+      if(code_value_long() != 0) {
+     current_position[X_AXIS]=code_value()+add_homing[X_AXIS];
+      }
+    }
+
+    if(code_seen(axis_codes[Y_AXIS])) {
+      if(code_value_long() != 0) {
+       #ifdef SCARA
+     current_position[Y_AXIS]=code_value();
+  #else
+     current_position[Y_AXIS]=code_value()+add_homing[Y_AXIS];
+  #endif
+      }
+    }
+
+    plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
+
+
+    //Enable Lidar Endstop and Zero to Edge of Material
+
+
+          destination_lidar[X_AXIS] = 60;
+          destination_lidar[Y_AXIS] = 20;
+          feedrate_lidar = 2000;
+
+          plan_buffer_line(destination_lidar[X_AXIS], destination_lidar[Y_AXIS], destination_lidar[Z_AXIS], destination_lidar[E_AXIS], feedrate_lidar/60, active_extruder);
+          st_synchronize();
+
+          enable_endstops(true);
+          feedrate = 0.0;
+          for(int8_t i=0; i < NUM_AXIS; i++) {
+            destination[i] = current_position[i];
+          }
+
+          home_all_axis = !((code_seen(axis_codes[X_AXIS])) || (code_seen(axis_codes[Y_AXIS])) || (code_seen(axis_codes[Z_AXIS])));
+
+          if((home_all_axis) || (code_seen(axis_codes[X_AXIS])))
+          {
+            digitalWrite(LIDAR_RESET, HIGH);
+            delay(1000);
+            digitalWrite(LIDAR_RESET, LOW);
+
+            digitalWrite(LIDAR_TRIGGER, HIGH);
+            delay(500);
+            LIDAR_HOMEAXIS(X);
+            digitalWrite(LIDAR_TRIGGER, LOW);
+          }
+          delay(1000);
+
+          destination_lidar[X_AXIS] = 80;
+          destination_lidar[Y_AXIS] = 245;
+          feedrate_lidar = 2000;
+
+
+          plan_buffer_line(destination_lidar[X_AXIS], destination_lidar[Y_AXIS], destination_lidar[Z_AXIS], destination_lidar[E_AXIS], feedrate_lidar/60, active_extruder);
+          st_synchronize();
+
+          if((home_all_axis) || (code_seen(axis_codes[Y_AXIS]))) {
+            digitalWrite(LIDAR_RESET, HIGH);
+            delay(1000);
+            digitalWrite(LIDAR_RESET, LOW);
+
+            digitalWrite(LIDAR_TRIGGER, HIGH);
+            delay(500);
+            LIDAR_HOMEAXIS(Y);
+            digitalWrite(LIDAR_TRIGGER, LOW);
+          }
+
+          delay(1000);
+/*
+
+          destination_lidar[X_AXIS] = -60;
+          destination_lidar[Y_AXIS] = 0;
+
+          plan_buffer_line(destination_lidar[X_AXIS], destination_lidar[Y_AXIS], destination_lidar[Z_AXIS], destination_lidar[E_AXIS], feedrate/60, active_extruder);
+          st_synchronize();
+          plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
+
+          #ifdef ENDSTOPS_ONLY_FOR_HOMING
+            enable_endstops(false);
+          #endif
+
+          digitalWrite(LIDAR_TRIGGER, LOW);
+
+          feedrate = saved_feedrate;
+          feedmultiply = saved_feedmultiply;
+          previous_millis_cmd = millis();
+          endstops_hit_on_purpose(); */
+          break;
+
+
+
     case 28: //G28 Home all Axis one at a time
 #ifdef ENABLE_AUTO_BED_LEVELING
       plan_bed_level_matrix.set_to_identity();  //Reset the plane ("erase" all leveling data)
