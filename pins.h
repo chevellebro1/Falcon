@@ -657,15 +657,15 @@
   #endif
 
   #if MB(RAMPS_13_EFB) || MB(RAMPS_13_EFF) || MB(AZTEEG_X3)
-    #define FAN_PIN            49 // (Sprinter config)
+    #define FAN_PIN            -1 // (Sprinter config)
   #elif MB(AZTEEG_X3_PRO)
-    #define FAN_PIN            49 // Last Heater Pin on board
+    #define FAN_PIN            -1 // Last Heater Pin on board
   #else
-    #define FAN_PIN            49 // IO pin. Buffer needed
+    #define FAN_PIN            -1 // IO pin. Buffer needed
   #endif
 
   #if MB(3DRAG) || MB(RAMPS_13_EEF)
-    #define FAN_PIN            49
+    #define FAN_PIN            -1
   #endif
 
   #if MB(RAMPS_13_EFF)
