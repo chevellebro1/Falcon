@@ -542,7 +542,7 @@
 
 
 // uncomment one of the following lines for RAMPS v1.3 or v1.0, comment both for v1.2 or 1.1
-// #define RAMPS_V_1_3
+#define RAMPS_V_1_3
 // #define RAMPS_V_1_0
 
 
@@ -657,15 +657,15 @@
   #endif
 
   #if MB(RAMPS_13_EFB) || MB(RAMPS_13_EFF) || MB(AZTEEG_X3)
-    #define FAN_PIN            9 // (Sprinter config)
+    #define FAN_PIN            49 // (Sprinter config)
   #elif MB(AZTEEG_X3_PRO)
-    #define FAN_PIN            11 // Last Heater Pin on board
+    #define FAN_PIN            49 // Last Heater Pin on board
   #else
-    #define FAN_PIN            4 // IO pin. Buffer needed
+    #define FAN_PIN            49 // IO pin. Buffer needed
   #endif
 
   #if MB(3DRAG) || MB(RAMPS_13_EEF)
-    #define FAN_PIN            8
+    #define FAN_PIN            49
   #endif
 
   #if MB(RAMPS_13_EFF)
@@ -709,9 +709,9 @@
   #endif
 
   #define TEMP_0_PIN         13   // ANALOG NUMBERING
-  #define TEMP_1_PIN         15   // ANALOG NUMBERING
+  #define TEMP_1_PIN         12   // ANALOG NUMBERING
   #if MB(AZTEEG_X3_PRO)
-    #define TEMP_2_PIN         12   // ANALOG NUMBERING
+    #define TEMP_2_PIN         15   // ANALOG NUMBERING
     #define TEMP_3_PIN         11   // ANALOG NUMBERING
     #define TEMP_4_PIN         10   // ANALOG NUMBERING
     #define TC1                4    // ANALOG NUMBERING Thermo couple on Azteeg X3Pro
@@ -885,11 +885,11 @@
 #ifdef RAMPS_V_1_0 // RAMPS_V_1_0
   #define HEATER_0_PIN     12    // RAMPS 1.0
   #define HEATER_BED_PIN   -1    // RAMPS 1.0
-  #define FAN_PIN          11    // RAMPS 1.0
+  #define FAN_PIN          49    // RAMPS 1.0
 #else // RAMPS_V_1_1 or RAMPS_V_1_2
   #define HEATER_0_PIN     10    // RAMPS 1.1
   #define HEATER_BED_PIN    8    // RAMPS 1.1
-  #define FAN_PIN           9    // RAMPS 1.1
+  #define FAN_PIN           49    // RAMPS 1.1
 #endif
 #define HEATER_1_PIN        -1
 #define HEATER_2_PIN        -1
