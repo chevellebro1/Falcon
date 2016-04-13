@@ -358,6 +358,7 @@ static float offset[3] = {0.0, 0.0, 0.0};
 static bool home_all_axis = true;
 static float feedrate = 1500.0, next_feedrate, saved_feedrate;
 static float rapid_feedrate = 2000;
+static float rapid_feedrate_z = 240;
 static long gcode_N, gcode_LastN, Stopped_gcode_LastN = 0;
 
 static bool relative_mode = false;  //Determines Absolute or Relative Coordinates
@@ -1371,8 +1372,15 @@ void process_commands()
     switch((int)code_value())
     {
     case 0: // G0
-    if(Stopped == false) {
-      get_coordinates_rapid(); // For X Y Z E F
+    /*if(Stopped == false) {
+      get_coordinates(); // For X Y Z E F
+      next_feedrate = rapid_feedrate;
+      if(next_feedrate > 0.0) feedrate = next_feedrate;
+      if(code_seen('Z')) {
+        next_feedrate = rapid_feedrate_z;
+        if(next_feedrate > 0.0) feedrate = next_feedrate;
+      }
+
         #ifdef FWRETRACT
           if(autoretract_enabled)
           if( !(code_seen('X') || code_seen('Y') || code_seen('Z')) && code_seen('E')) {
@@ -1388,7 +1396,7 @@ void process_commands()
       prepare_move();
       //ClearToSend();
     }
-    break;
+    break; */
     case 1: // G1
       if(Stopped == false) {
         get_coordinates(); // For X Y Z E F
@@ -3985,21 +3993,6 @@ void get_coordinates()
     next_feedrate = code_value();
     if(next_feedrate > 0.0) feedrate = next_feedrate;
   }
-}
-
-void get_coordinates_rapid()
-{
-  bool seen[4]={false,false,false,false};
-  for(int8_t i=0; i < NUM_AXIS; i++) {
-    if(code_seen(axis_codes[i]))
-    {
-      destination[i] = (float)code_value() + (axis_relative_modes[i] || relative_mode)*current_position[i];
-      seen[i]=true;
-    }
-    else destination[i] = current_position[i]; //Are these else lines really needed?
-  }
-  next_feedrate = rapid_feedrate;
-  if(next_feedrate > 0.0) feedrate = next_feedrate;
 }
 
 void get_arc_coordinates()
