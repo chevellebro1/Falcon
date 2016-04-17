@@ -46,11 +46,11 @@
 
 //  extruder run-out prevention.
 //if the machine is idle, and the temperature over MINTEMP, every couple of SECONDS some filament is extruded
-//#define EXTRUDER_RUNOUT_PREVENT
+#define EXTRUDER_RUNOUT_PREVENT
 #define EXTRUDER_RUNOUT_MINTEMP 190
-#define EXTRUDER_RUNOUT_SECONDS 30.
-#define EXTRUDER_RUNOUT_ESTEPS 14. //mm filament
-#define EXTRUDER_RUNOUT_SPEED 1500.  //extrusion speed
+#define EXTRUDER_RUNOUT_SECONDS 60.
+#define EXTRUDER_RUNOUT_ESTEPS 5. //mm filament
+#define EXTRUDER_RUNOUT_SPEED 300.  //extrusion speed
 #define EXTRUDER_RUNOUT_EXTRUDE 100
 
 //These defines help to calibrate the AD595 sensor in case you get wrong temperature measurements.

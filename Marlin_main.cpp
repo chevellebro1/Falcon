@@ -108,6 +108,8 @@
 //        Call gcode file : "M32 P !filename#" and return to caller file after finishing (similar to #include).
 //        The '#' is necessary when calling from within sd files, as it stops buffer prereading
 // M42  - Change pin status via gcode Use M42 Px Sy to set pin x to value y, when omitting Px the onboard led will be used.
+// M60  - Change to CNC Mill
+// M61  - Change to 3D Printer
 // M80  - Turn on Power Supply
 // M81  - Turn off Power Supply
 // M82  - Set E codes absolute (default)
@@ -360,6 +362,7 @@ static float feedrate = 1500.0, next_feedrate, saved_feedrate;
 static float rapid_feedrate = 2000;
 static float rapid_feedrate_z = 240;
 static long gcode_N, gcode_LastN, Stopped_gcode_LastN = 0;
+static float mill = 0;
 
 static bool relative_mode = false;  //Determines Absolute or Relative Coordinates
 
@@ -1372,14 +1375,17 @@ void process_commands()
     switch((int)code_value())
     {
     case 0: // G0
-    /*if(Stopped == false) {
+      if(Stopped == false) {
       get_coordinates(); // For X Y Z E F
-      next_feedrate = rapid_feedrate;
-      if(next_feedrate > 0.0) feedrate = next_feedrate;
-      if(code_seen('Z')) {
-        next_feedrate = rapid_feedrate_z;
+      if(mill == 1) {
+        next_feedrate = rapid_feedrate;
         if(next_feedrate > 0.0) feedrate = next_feedrate;
-      }
+        if(code_seen('Z')) {
+          next_feedrate = rapid_feedrate_z;
+          if(next_feedrate > 0.0) feedrate = next_feedrate;
+            }
+          }
+        }
 
         #ifdef FWRETRACT
           if(autoretract_enabled)
@@ -1395,8 +1401,7 @@ void process_commands()
         #endif //FWRETRACT
       prepare_move();
       //ClearToSend();
-    }
-    break; */
+    break;
     case 1: // G1
       if(Stopped == false) {
         get_coordinates(); // For X Y Z E F
@@ -1414,7 +1419,6 @@ void process_commands()
           #endif //FWRETRACT
         prepare_move();
         //ClearToSend();
-      }
       break;
 #ifndef SCARA //disable arc support
     case 2: // G2  - CW ARC
@@ -1907,7 +1911,7 @@ void process_commands()
       break;
     }
   }
-
+}
   else if(code_seen('M'))
   {
     switch( (int)code_value() )
@@ -2141,6 +2145,18 @@ void process_commands()
           analogWrite(pin_number, pin_status);
         }
       }
+     break;
+
+     case 60: //M60 Change to CNC Mill
+     {
+       mill = 1;
+     }
+     break;
+
+     case 61: //M61 Change to 3D Printer
+     {
+       mill = 0;
+     }
      break;
 
 // M48 Z-Probe repeatability measurement function.
