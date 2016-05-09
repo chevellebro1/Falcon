@@ -1972,13 +1972,15 @@ void process_commands()
     case 3: // M3 - Spindle On
       pinMode(SPINDLE, OUTPUT);
       pinMode(SPINDLE_PWM, OUTPUT);
-      if (code_seen('S')){
-        spindleSpeed == constrain(code_value(),0,1000);
+      digitalWrite(SPINDLE, HIGH);
+      if(code_seen('S')) {
+        spindleSpeed = constrain(code_value(),0,10000);
+        analogWrite(SPINDLE_PWM, spindleSpeed / 46);
       }
       else {
-        spindleSpeed=1000;
+        spindleSpeed=5000;
+        analogWrite(SPINDLE_PWM, spindleSpeed / 46);
       }
-      digitalWrite(SPINDLE, HIGH);
       break;
 
     case 5: // M5 - Spindle Off
