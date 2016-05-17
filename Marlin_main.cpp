@@ -153,6 +153,7 @@
 // M221 S<factor in percent>- set extrude factor override percentage
 // M226 P<pin number> S<pin state>- Wait until the specified pin reaches the state required
 // M240 - Trigger a camera to take a photograph
+// M245 - Cooler Fan
 // M250 - Set LCD contrast C<contrast value> (value 0..63)
 // M280 - set servo position absolute. P: servo index, S: angle or microseconds
 // M300 - Play beep sound S<frequency Hz> P<duration ms>
@@ -3335,6 +3336,19 @@ Sigma_Exit:
       #endif //chdk end if
      }
     break;
+
+    case 245: //M245 Cooling Fan On
+      {
+        analogWrite(CoolingFan, 0);
+      }
+    break;
+
+    case 246: //M246 Cooling Fan Off
+      {
+        analogWrite(CoolingFan, 255);
+      }
+    break;
+
 #ifdef DOGLCD
     case 250: // M250  Set LCD contrast value: C<value> (value 0..63)
      {
