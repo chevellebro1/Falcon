@@ -2970,6 +2970,16 @@ DaveX plan for Teensylu/printrboard-type pinouts (ref teensylu & sprinter) for a
 
 #define CoolingFan         57
 
+#define LASER_BEAM         58
+
+#define LASER_PWR          63
+
+#define SPINDLE_POS        11
+#define SPINDLE_NEG         5
+
+#define LASER_POS           6
+#define LASER_NEG           4
+
 
 #define SENSITIVE_PINS {0, 1, X_STEP_PIN, X_DIR_PIN, X_ENABLE_PIN, X_MIN_PIN, X_MAX_PIN, Y_STEP_PIN, Y_DIR_PIN, Y_ENABLE_PIN, Y_MIN_PIN, Y_MAX_PIN, Z_STEP_PIN, Z_DIR_PIN, Z_ENABLE_PIN, Z_MIN_PIN, Z_MAX_PIN, PS_ON_PIN, \
                         HEATER_BED_PIN, FAN_PIN,                  \

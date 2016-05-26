@@ -89,6 +89,8 @@
 // M1   - Same as M0
 // M3   - Spindle On
 // M5   - Spindle Off
+// M10  - Laser On
+// M11  - Laser Off
 // M17  - Enable/Power all stepper motors
 // M18  - Disable all stepper motors; same as M84
 // M20  - List SD card
@@ -110,6 +112,7 @@
 // M42  - Change pin status via gcode Use M42 Px Sy to set pin x to value y, when omitting Px the onboard led will be used.
 // M60  - Change to CNC Mill
 // M61  - Change to 3D Printer
+// M62  - Change to Laser Cutter
 // M80  - Turn on Power Supply
 // M81  - Turn off Power Supply
 // M82  - Set E codes absolute (default)
@@ -1971,9 +1974,11 @@ void process_commands()
     break;
 #endif
     case 3: // M3 - Spindle On
-      pinMode(SPINDLE, OUTPUT);
+      pinMode(SPINDLE_POS, OUTPUT);
+      pinMode(SPINDLE_NEG, OUTPUT);
       pinMode(SPINDLE_PWM, OUTPUT);
-      digitalWrite(SPINDLE, HIGH);
+      digitalWrite(SPINDLE_POS, LOW);
+      digitalWrite(SPINDLE_NEG, LOW);
       if(code_seen('S')) {
         spindleSpeed = constrain(code_value(),0,10000);
         analogWrite(SPINDLE_PWM, spindleSpeed / 46);
@@ -1985,8 +1990,20 @@ void process_commands()
       break;
 
     case 5: // M5 - Spindle Off
-        pinMode(SPINDLE, OUTPUT);
-        digitalWrite(SPINDLE, LOW);
+        pinMode(SPINDLE_POS, OUTPUT);
+        pinMode(SPINDLE_NEG, OUTPUT);
+        digitalWrite(SPINDLE_POS, HIGH);
+        digitalWrite(SPINDLE_NEG, HIGH);
+      break;
+
+    case 10: // M10 - Laser On
+        pinMode(LASER_BEAM, OUTPUT);
+        digitalWrite(LASER_BEAM, HIGH);
+      break;
+
+    case 11: // M11 - Laser Off
+        pinMode(LASER_BEAM, OUTPUT);
+        digitalWrite(LASER_BEAM, LOW);
       break;
 
     case 17:
@@ -2153,14 +2170,54 @@ void process_commands()
      case 60: //M60 Change to CNC Mill
      {
        mill = 1;
+       pinMode(LASER_POS, OUTPUT);
+       pinMode(LASER_NEG, OUTPUT);
+       pinMode(LASER_PWR, OUTPUT);
+       pinMode(LASER_BEAM, OUTPUT);
+       digitalWrite(LASER_PWR, LOW);
+       digitalWrite(LASER_POS, HIGH);
+       digitalWrite(LASER_NEG, HIGH);
+       digitalWrite(LASER_BEAM, LOW);
+       analogWrite(CoolingFan, 255);
      }
      break;
 
      case 61: //M61 Change to 3D Printer
      {
        mill = 0;
+       pinMode(SPINDLE_POS, OUTPUT);
+       pinMode(SPINDLE_NEG, OUTPUT);
+       pinMode(LASER_POS, OUTPUT);
+       pinMode(LASER_NEG, OUTPUT);
+       pinMode(LASER_PWR, OUTPUT);
+       pinMode(LASER_BEAM, OUTPUT);
+       digitalWrite(LASER_PWR, LOW);
+       digitalWrite(LASER_POS, HIGH);
+       digitalWrite(LASER_NEG, HIGH);
+       digitalWrite(SPINDLE_POS, HIGH);
+       digitalWrite(SPINDLE_NEG, HIGH);
+       digitalWrite(LASER_BEAM, LOW);
+       analogWrite(CoolingFan, 255);
      }
      break;
+
+     case 62: //M62 Change to Laser Cutter
+     {
+       mill = 1;
+       pinMode(SPINDLE_POS, OUTPUT);
+       pinMode(SPINDLE_NEG, OUTPUT);
+       pinMode(LASER_POS, OUTPUT);
+       pinMode(LASER_NEG, OUTPUT);
+       pinMode(LASER_PWR, OUTPUT);
+       pinMode(LASER_BEAM, OUTPUT);
+       digitalWrite(LASER_PWR, HIGH);
+       digitalWrite(LASER_POS, LOW);
+       digitalWrite(LASER_NEG, LOW);
+       digitalWrite(SPINDLE_POS, HIGH);
+       digitalWrite(SPINDLE_NEG, HIGH);
+       digitalWrite(LASER_BEAM, LOW);
+       analogWrite(CoolingFan, 0);
+     }
 
 // M48 Z-Probe repeatability measurement function.
 //
