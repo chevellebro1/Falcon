@@ -714,7 +714,7 @@
     #define TEMP_2_PIN         15   // ANALOG NUMBERING
     #define TEMP_3_PIN         11   // ANALOG NUMBERING
     #define TEMP_4_PIN         10   // ANALOG NUMBERING
-    #define TC1                4    // ANALOG NUMBERING Thermo couple on Azteeg X3Pro
+    #define TC1                -1    // ANALOG NUMBERING Thermo couple on Azteeg X3Pro
     #define TC2                5    // ANALOG NUMBERING Thermo couple on Azteeg X3Pro
   #else
     #define TEMP_2_PIN         -1   // ANALOG NUMBERING

@@ -365,6 +365,7 @@ static bool home_all_axis = true;
 static float feedrate = 1500.0, next_feedrate, saved_feedrate;
 static float rapid_feedrate = 2000;
 static float rapid_feedrate_z = 240;
+static float prev_feedrate = 0;
 static long gcode_N, gcode_LastN, Stopped_gcode_LastN = 0;
 static float mill = 0;
 
@@ -565,6 +566,17 @@ void servo_init()
   #endif
 }
 
+void startup()
+{
+  mill = 0;
+  digitalWrite(LASER_PWR, LOW);
+  digitalWrite(LASER_POS, HIGH);
+  digitalWrite(LASER_NEG, HIGH);
+  digitalWrite(SPINDLE_POS, HIGH);
+  digitalWrite(SPINDLE_NEG, HIGH);
+  digitalWrite(LASER_BEAM, LOW);
+  analogWrite(CoolingFan, 255);
+}
 
 void setup()
 {
@@ -633,6 +645,14 @@ void setup()
   digitalWrite(SERVO0_PIN, LOW); // turn it off
 #endif // Z_PROBE_SLED
   setup_homepin();
+  pinMode(LASER_BEAM, OUTPUT);
+  pinMode(SPINDLE_POS, OUTPUT);
+  pinMode(SPINDLE_NEG, OUTPUT);
+  pinMode(SPINDLE_PWM, OUTPUT);
+  pinMode(LASER_POS, OUTPUT);
+  pinMode(LASER_NEG, OUTPUT);
+  pinMode(LASER_PWR, OUTPUT);
+  startup();
 }
 
 
@@ -1409,6 +1429,12 @@ void process_commands()
     case 1: // G1
       if(Stopped == false) {
         get_coordinates(); // For X Y Z E F
+        if(mill == 1) {
+          if(feedrate == rapid_feedrate) {
+            next_feedrate = prev_feedrate;
+            if(next_feedrate > 0.0) feedrate = next_feedrate;
+          }
+        }
           #ifdef FWRETRACT
             if(autoretract_enabled)
             if( !(code_seen('X') || code_seen('Y') || code_seen('Z')) && code_seen('E')) {
@@ -1428,12 +1454,22 @@ void process_commands()
     case 2: // G2  - CW ARC
       if(Stopped == false) {
         get_arc_coordinates();
+        if(mill == 1) {
+          if(feedrate == rapid_feedrate) {
+            next_feedrate = prev_feedrate;
+            if(next_feedrate > 0.0) feedrate = next_feedrate;
+          }
         prepare_arc_move(true);
       }
       break;
     case 3: // G3  - CCW ARC
       if(Stopped == false) {
         get_arc_coordinates();
+        if(mill == 1) {
+          if(feedrate == rapid_feedrate) {
+            next_feedrate = prev_feedrate;
+            if(next_feedrate > 0.0) feedrate = next_feedrate;
+          }
         prepare_arc_move(false);
       }
       break;
@@ -1974,9 +2010,6 @@ void process_commands()
     break;
 #endif
     case 3: // M3 - Spindle On
-      pinMode(SPINDLE_POS, OUTPUT);
-      pinMode(SPINDLE_NEG, OUTPUT);
-      pinMode(SPINDLE_PWM, OUTPUT);
       digitalWrite(SPINDLE_POS, LOW);
       digitalWrite(SPINDLE_NEG, LOW);
       if(code_seen('S')) {
@@ -1990,19 +2023,16 @@ void process_commands()
       break;
 
     case 5: // M5 - Spindle Off
-        pinMode(SPINDLE_POS, OUTPUT);
-        pinMode(SPINDLE_NEG, OUTPUT);
         digitalWrite(SPINDLE_POS, HIGH);
         digitalWrite(SPINDLE_NEG, HIGH);
       break;
 
     case 10: // M10 - Laser On
-        pinMode(LASER_BEAM, OUTPUT);
         digitalWrite(LASER_BEAM, HIGH);
       break;
 
     case 11: // M11 - Laser Off
-        pinMode(LASER_BEAM, OUTPUT);
+        st_synchronize();
         digitalWrite(LASER_BEAM, LOW);
       break;
 
@@ -2170,10 +2200,6 @@ void process_commands()
      case 60: //M60 Change to CNC Mill
      {
        mill = 1;
-       pinMode(LASER_POS, OUTPUT);
-       pinMode(LASER_NEG, OUTPUT);
-       pinMode(LASER_PWR, OUTPUT);
-       pinMode(LASER_BEAM, OUTPUT);
        digitalWrite(LASER_PWR, LOW);
        digitalWrite(LASER_POS, HIGH);
        digitalWrite(LASER_NEG, HIGH);
@@ -2185,12 +2211,6 @@ void process_commands()
      case 61: //M61 Change to 3D Printer
      {
        mill = 0;
-       pinMode(SPINDLE_POS, OUTPUT);
-       pinMode(SPINDLE_NEG, OUTPUT);
-       pinMode(LASER_POS, OUTPUT);
-       pinMode(LASER_NEG, OUTPUT);
-       pinMode(LASER_PWR, OUTPUT);
-       pinMode(LASER_BEAM, OUTPUT);
        digitalWrite(LASER_PWR, LOW);
        digitalWrite(LASER_POS, HIGH);
        digitalWrite(LASER_NEG, HIGH);
@@ -2204,12 +2224,6 @@ void process_commands()
      case 62: //M62 Change to Laser Cutter
      {
        mill = 1;
-       pinMode(SPINDLE_POS, OUTPUT);
-       pinMode(SPINDLE_NEG, OUTPUT);
-       pinMode(LASER_POS, OUTPUT);
-       pinMode(LASER_NEG, OUTPUT);
-       pinMode(LASER_PWR, OUTPUT);
-       pinMode(LASER_BEAM, OUTPUT);
        digitalWrite(LASER_PWR, HIGH);
        digitalWrite(LASER_POS, LOW);
        digitalWrite(LASER_NEG, LOW);
@@ -4080,6 +4094,7 @@ void get_coordinates()
   }
   if(code_seen('F')) {
     next_feedrate = code_value();
+    prev_feedrate = code_value();
     if(next_feedrate > 0.0) feedrate = next_feedrate;
   }
 }
