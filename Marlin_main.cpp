@@ -1459,6 +1459,7 @@ void process_commands()
             next_feedrate = prev_feedrate;
             if(next_feedrate > 0.0) feedrate = next_feedrate;
           }
+        }
         prepare_arc_move(true);
       }
       break;
@@ -1470,6 +1471,7 @@ void process_commands()
             next_feedrate = prev_feedrate;
             if(next_feedrate > 0.0) feedrate = next_feedrate;
           }
+        }
         prepare_arc_move(false);
       }
       break;
@@ -2032,7 +2034,6 @@ void process_commands()
       break;
 
     case 11: // M11 - Laser Off
-        st_synchronize();
         digitalWrite(LASER_BEAM, LOW);
       break;
 
