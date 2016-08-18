@@ -168,9 +168,9 @@
 
 // If you are using a pre-configured hotend then you can use one of the value sets by uncommenting it
 // Ultimaker
-    #define  DEFAULT_Kp 22.2
-    #define  DEFAULT_Ki 1.08
-    #define  DEFAULT_Kd 114
+    #define  DEFAULT_Kp 24.78
+    #define  DEFAULT_Ki 2.19
+    #define  DEFAULT_Kd 70.02
 
 // MakerGear
 //    #define  DEFAULT_Kp 7.0
@@ -342,10 +342,10 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 #define max_software_endstops true  // If true, axis won't move to coordinates greater than the defined lengths below.
 
 // Travel limits after homing
-#define X_MAX_POS 300
-#define X_MIN_POS 0
-#define Y_MAX_POS 300
-#define Y_MIN_POS 0
+#define X_MAX_POS 271
+#define X_MIN_POS -29
+#define Y_MAX_POS 292
+#define Y_MIN_POS -8
 #define Z_MAX_POS 220
 #define Z_MIN_POS 0
 
@@ -493,6 +493,8 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 
 #define DEFAULT_ACCELERATION          2000    // X, Y, Z and E max acceleration in mm/s^2 for printing moves
 #define DEFAULT_RETRACT_ACCELERATION  2000   // X, Y, Z and E max acceleration in mm/s^2 for retracts
+
+//Layer Heights: 0.0952, 0.1904, 0.2962
 
 // Offset of the extruders (uncomment if using more than one and relying on firmware to position when changing).
 // The offset has to be X=0, Y=0 for the extruder 0 hotend (default extruder).
